@@ -1,5 +1,13 @@
 <img align="right" src="./static/images/wadm_128.png" alt="wadm logo" />
 
+# ⚠️ DEPRECATED — This repository is no longer maintained
+
+**wasmCloud v2.0 (released March 2026) replaced wadm entirely.** The v1 architecture — OAM manifests, NATS JetStream state, and the `wasmcloud-control-interface` crate — has been superseded by a Kubernetes-native runtime-operator with CRDs. wadm is not part of the wasmCloud v2 roadmap and receives no further updates from upstream.
+
+**If you are running wasmCloud**, migrate to the [wasmCloud runtime-operator](https://wasmcloud.com/docs/kubernetes-operator/) and manage workloads via standard Kubernetes tooling (kubectl, Helm, ArgoCD).
+
+---
+
 # wasmCloud Application Deployment Manager (wadm)
 
 Wadm is a Wasm-native orchestrator for managing and scaling declarative wasmCloud applications.
