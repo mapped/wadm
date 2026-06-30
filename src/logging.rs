@@ -1,10 +1,10 @@
 use std::io::IsTerminal;
 
-use opentelemetry::sdk::{
-    trace::{IdGenerator, Sampler},
+use opentelemetry_otlp::{Protocol, SpanExporter, WithExportConfig};
+use opentelemetry_sdk::{
+    trace::{RandomIdGenerator, Sampler, SdkTracerProvider},
     Resource,
 };
-use opentelemetry_otlp::{Protocol, WithExportConfig};
 use tracing::{Event as TracingEvent, Subscriber};
 use tracing_subscriber::fmt::{
     format::{Format, Full, Json, JsonFields, Writer},
@@ -65,31 +65,29 @@ pub fn configure_tracing(
     if !tracing_endpoint.ends_with(TRACING_PATH) {
         tracing_endpoint.push_str(TRACING_PATH);
     }
-    let res = match opentelemetry_otlp::new_pipeline()
-        .tracing()
-        .with_exporter(
-            opentelemetry_otlp::new_exporter()
-                .http()
-                .with_endpoint(tracing_endpoint)
-                .with_protocol(Protocol::HttpBinary),
-        )
-        .with_trace_config(
-            opentelemetry::sdk::trace::config()
+
+    let exporter = SpanExporter::builder()
+        .with_http()
+        .with_endpoint(tracing_endpoint)
+        .with_protocol(Protocol::HttpBinary)
+        .build();
+
+    let res = match exporter {
+        Ok(exporter) => {
+            let provider = SdkTracerProvider::builder()
                 .with_sampler(Sampler::AlwaysOn)
-                .with_id_generator(IdGenerator::default())
+                .with_id_generator(RandomIdGenerator::default())
                 .with_max_events_per_span(64)
                 .with_max_attributes_per_span(16)
-                .with_max_events_per_span(16)
-                .with_resource(Resource::new(vec![opentelemetry::KeyValue::new(
-                    "service.name",
-                    "wadm",
-                )])),
-        )
-        .install_batch(opentelemetry::runtime::Tokio)
-    {
-        Ok(t) => tracing::subscriber::set_global_default(
-            subscriber.with(tracing_opentelemetry::layer().with_tracer(t)),
-        ),
+                .with_resource(Resource::builder().with_service_name("wadm").build())
+                .with_batch_exporter(exporter)
+                .build();
+            let tracer = opentelemetry::trace::TracerProvider::tracer(&provider, "wadm");
+            opentelemetry::global::set_tracer_provider(provider);
+            tracing::subscriber::set_global_default(
+                subscriber.with(tracing_opentelemetry::layer().with_tracer(tracer)),
+            )
+        }
         Err(e) => {
             eprintln!(
                 "Unable to configure OTEL tracing, defaulting to logging only: {:?}",

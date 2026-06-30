@@ -24,9 +24,8 @@ members = ["crates/*"]
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive", "cargo", "env"] }
-# One version back to avoid clashes with 0.10 of otlp
-opentelemetry = { workspace = true, features = ["rt-tokio"] }
-# 0.10 to avoid protoc dep
+opentelemetry = { workspace = true }
+opentelemetry_sdk = { workspace = true }
 opentelemetry-otlp = { workspace = true, features = [
     "http-proto",
     "reqwest-client",
@@ -57,10 +56,9 @@ indexmap = { version = "2", features = ["serde"] }
 jsonschema = "0.29"
 lazy_static = "1"
 nkeys = "0.4.5"
-# One version back to avoid clashes with 0.10 of otlp
-opentelemetry = { version = "0.17", features = ["rt-tokio"] }
-# 0.10 to avoid protoc dep
-opentelemetry-otlp = { version = "0.10", features = [
+opentelemetry = { version = "0.32" }
+opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.32", features = [
     "http-proto",
     "reqwest-client",
 ] }
@@ -78,7 +76,7 @@ thiserror = "2"
 tokio = { version = "1", default-features = false }
 tracing = { version = "0.1", features = ["log"] }
 tracing-futures = "0.2"
-tracing-opentelemetry = { version = "0.17" }
+tracing-opentelemetry = { version = "0.33" }
 tracing-subscriber = { version = "0.3.20", features = ["env-filter", "json"] }
 ulid = { version = "1", features = ["serde"] }
 utoipa = "5"
