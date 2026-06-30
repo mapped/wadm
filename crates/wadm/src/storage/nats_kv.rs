@@ -23,7 +23,7 @@ use async_nats::{
 use async_trait::async_trait;
 use futures::Future;
 use serde::{de::DeserializeOwned, Serialize};
-use tracing::{debug, error, field::Empty, instrument, trace};
+use tracing::{debug, field::Empty, instrument, trace};
 use tracing_futures::Instrument;
 
 use super::{ReadStore, StateKind, Store};
@@ -31,11 +31,11 @@ use super::{ReadStore, StateKind, Store};
 /// Errors that can be encountered by NATS KV Store implemenation
 #[derive(Debug, thiserror::Error)]
 pub enum NatsStoreError {
-    /// An I/O error occured
+    /// An I/O error occurred
     #[error("I/O Error: {0}")]
     Io(#[from] IoError),
 
-    /// An error occured when performing a NATS operation
+    /// An error occurred when performing a NATS operation
     #[error("NATS error: {0:?}")]
     Nats(#[from] NatsError),
 
